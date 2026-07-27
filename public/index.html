@@ -154,8 +154,8 @@
 
   load();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/index.js"></script>
-<script>
+<script type="module">
+  import Vapi from "https://esm.sh/@vapi-ai/web@latest";
   const vapi = new Vapi("3205a16f-26e2-4729-9dec-6c86f6fe1c1e");
   const callBtn = document.getElementById("call-btn");
   let active = false;
