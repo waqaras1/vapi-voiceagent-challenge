@@ -28,11 +28,16 @@
   tr:hover td { background: #fafafa; }
   .mono { font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; }
   .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; background: #e8f0fe; color: #1a56db; }
+  #call-btn { background: #16a34a; font-size: 14px; padding: 8px 18px; border-radius: 20px; }
+  #call-btn:hover { background: #15803d; }
+  #call-btn.active { background: #dc2626; }
+  #call-btn.active:hover { background: #b91c1c; }
 </style>
 </head>
 <body>
 <header>
   <h1>CareCloud Patient Registry</h1>
+  <button id="call-btn">📞 Talk to Riley</button>
   <div class="search-row">
     <input type="text" id="q-name" placeholder="Last name" />
     <input type="text" id="q-phone" placeholder="Phone number" />
@@ -148,6 +153,18 @@
   document.getElementById('q-phone').addEventListener('keydown', e => e.key === 'Enter' && search());
 
   load();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/index.js"></script>
+<script>
+  const vapi = new Vapi("3205a16f-26e2-4729-9dec-6c86f6fe1c1e");
+  const callBtn = document.getElementById("call-btn");
+  let active = false;
+  callBtn.onclick = () => {
+    if (active) { vapi.stop(); }
+    else { vapi.start("254af8ce-2159-46e4-871c-defbda9a4042"); }
+  };
+  vapi.on("call-start", () => { active = true; callBtn.textContent = "⏹ End call"; callBtn.classList.add("active"); });
+  vapi.on("call-end", () => { active = false; callBtn.textContent = "📞 Talk to Riley"; callBtn.classList.remove("active"); load(); });
 </script>
 </body>
 </html>
