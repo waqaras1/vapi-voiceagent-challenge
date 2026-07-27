@@ -32,6 +32,8 @@ if (VAPI_SECRET) {
   });
 }
 
+app.use(express.static("public"));
+
 // ─── Routes ────────────────────────────────────────────────────────
 app.use("/patients", patientRoutes);
 app.use("/vapi", vapiRoutes);
@@ -47,7 +49,7 @@ app.get("/agent-prompt", (_req, res) => {
   res.type("text/plain").send(agentPrompt);
 });
 
-app.get("/", (_req, res) => res.json({
+app.get("/api", (_req, res) => res.json({
   data: {
     service: "CareCloud Patient Registration API",
     endpoints: ["/health", "/patients", "/patients/:id", "/agent-prompt"],
