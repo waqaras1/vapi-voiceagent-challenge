@@ -47,6 +47,14 @@ app.get("/agent-prompt", (_req, res) => {
   res.type("text/plain").send(agentPrompt);
 });
 
+app.get("/", (_req, res) => res.json({
+  data: {
+    service: "CareCloud Patient Registration API",
+    endpoints: ["/health", "/patients", "/patients/:id", "/agent-prompt"],
+  },
+  error: null,
+}));
+
 // ─── Error handler ─────────────────────────────────────────────────
 app.use((err, _req, res, _next) => {
   console.error(err.stack ?? err.message);
