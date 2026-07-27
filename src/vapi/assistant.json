@@ -1,0 +1,239 @@
+{
+  "name": "CareCloud Patient Intake",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "temperature": 0.4,
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are Riley, a friendly intake coordinator at CareCloud Family Health. Your job is to collect demographic information from new patients over the phone.\n\nSpeak in a warm, natural tone. Use contractions. Ask one question at a time. Keep sentences under fifteen words. Read digits individually. Never say \"field,\" \"database,\" \"record,\" \"system,\" or \"form.\"\n\nCollection order (one at a time): first name, last name, date of birth, sex (Male/Female/Other/Decline to Answer), phone number. After the phone number, silently call lookup_patient — if found, offer to update; if not, continue. Then: street address, city, state, ZIP code.\n\nAfter required fields, offer optional fields once as a group: email, insurance info, emergency contact, preferred language.\n\nBefore saving, read back all information and ask for explicit confirmation. If the caller corrects one item, confirm only that item. Call register_patient only after confirmation.\n\nIf register_patient returns invalid_fields, explain each issue in plain language, ask for corrections one at a time, and resubmit.\n\nOn tool errors: say \"I'm having a little trouble, let me try again.\" Retry once. If it fails again, offer to transfer to a human.\n\nIf the caller says \"start over,\" discard everything and restart.\n\nNever give medical advice. For emergencies, say \"Please hang up and dial nine-one-one.\" Never invent information."
+      }
+    ]
+  },
+  "voice": {
+    "provider": "vapi",
+    "voiceId": "Paige"
+  },
+  "firstMessage": "Thanks for calling CareCloud Family Health, this is Riley. Are you calling to register as a new patient?",
+  "endCallFunctionEnabled": true,
+  "maxDurationSeconds": 600,
+  "silenceTimeoutSeconds": 30,
+  "serverUrl": "${SERVER_URL}/vapi/events",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "lookup_patient",
+        "description": "Look up an existing patient by phone number. Call this after collecting the caller's phone number to check if they are already registered.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "phone_number": {
+              "type": "string",
+              "description": "The patient's 10-digit US phone number. Digits only, no formatting."
+            }
+          },
+          "required": ["phone_number"]
+        }
+      },
+      "server": {
+        "url": "${SERVER_URL}/vapi/tools"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "register_patient",
+        "description": "Register a new patient with all collected demographic information. Call this only after reading back the information and receiving explicit confirmation from the caller.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "first_name": {
+              "type": "string",
+              "description": "Patient's first name. Letters, spaces, hyphens, and apostrophes only. 1-50 characters."
+            },
+            "last_name": {
+              "type": "string",
+              "description": "Patient's last name. Letters, spaces, hyphens, and apostrophes only. 1-50 characters."
+            },
+            "date_of_birth": {
+              "type": "string",
+              "description": "Patient's date of birth in MM/DD/YYYY or YYYY-MM-DD format. Must not be in the future. Year must be 1900 or later."
+            },
+            "sex": {
+              "type": "string",
+              "enum": ["Male", "Female", "Other", "Decline to Answer"],
+              "description": "Patient's sex for medical records."
+            },
+            "phone_number": {
+              "type": "string",
+              "description": "10-digit US phone number. Digits only. Must not start with 0 or 1."
+            },
+            "address_line_1": {
+              "type": "string",
+              "description": "Street address line 1."
+            },
+            "address_line_2": {
+              "type": "string",
+              "description": "Street address line 2 (apartment, suite, etc.). Optional."
+            },
+            "city": {
+              "type": "string",
+              "description": "City name. 1-100 characters."
+            },
+            "state": {
+              "type": "string",
+              "description": "Two-letter US state abbreviation (e.g., CA, NY, TX).",
+              "enum": [
+                "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+                "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+                "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"
+              ]
+            },
+            "zip_code": {
+              "type": "string",
+              "description": "US ZIP code. 5 digits or 5+4 format (e.g., 90210 or 90210-1234)."
+            },
+            "email": {
+              "type": "string",
+              "description": "Patient's email address. Optional."
+            },
+            "insurance_provider": {
+              "type": "string",
+              "description": "Name of insurance company. Optional."
+            },
+            "insurance_member_id": {
+              "type": "string",
+              "description": "Insurance member/policy ID. Optional."
+            },
+            "preferred_language": {
+              "type": "string",
+              "description": "Patient's preferred language. Defaults to English."
+            },
+            "emergency_contact_name": {
+              "type": "string",
+              "description": "Emergency contact's full name. Optional."
+            },
+            "emergency_contact_phone": {
+              "type": "string",
+              "description": "Emergency contact's 10-digit phone number. Digits only. Optional."
+            }
+          },
+          "required": [
+            "first_name",
+            "last_name",
+            "date_of_birth",
+            "sex",
+            "phone_number",
+            "address_line_1",
+            "city",
+            "state",
+            "zip_code"
+          ]
+        }
+      },
+      "server": {
+        "url": "${SERVER_URL}/vapi/tools"
+      },
+      "messages": [
+        { "type": "request-start", "content": "Let me get that saved for you." },
+        { "type": "request-failed", "content": "I'm having trouble saving that on my end." }
+      ]
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "update_patient",
+        "description": "Update an existing patient's information. Use when a returning patient wants to change their details. Pass patient_id and only the fields that need to change.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "patient_id": {
+              "type": "string",
+              "description": "UUID of the patient to update. Obtained from lookup_patient."
+            },
+            "first_name": {
+              "type": "string",
+              "description": "Updated first name."
+            },
+            "last_name": {
+              "type": "string",
+              "description": "Updated last name."
+            },
+            "date_of_birth": {
+              "type": "string",
+              "description": "Updated date of birth in MM/DD/YYYY or YYYY-MM-DD format."
+            },
+            "sex": {
+              "type": "string",
+              "enum": ["Male", "Female", "Other", "Decline to Answer"],
+              "description": "Updated sex."
+            },
+            "phone_number": {
+              "type": "string",
+              "description": "Updated 10-digit phone number."
+            },
+            "address_line_1": {
+              "type": "string",
+              "description": "Updated street address."
+            },
+            "address_line_2": {
+              "type": "string",
+              "description": "Updated address line 2."
+            },
+            "city": {
+              "type": "string",
+              "description": "Updated city."
+            },
+            "state": {
+              "type": "string",
+              "description": "Updated two-letter state abbreviation.",
+              "enum": [
+                "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+                "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+                "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"
+              ]
+            },
+            "zip_code": {
+              "type": "string",
+              "description": "Updated ZIP code."
+            },
+            "email": {
+              "type": "string",
+              "description": "Updated email."
+            },
+            "insurance_provider": {
+              "type": "string",
+              "description": "Updated insurance provider."
+            },
+            "insurance_member_id": {
+              "type": "string",
+              "description": "Updated insurance member ID."
+            },
+            "preferred_language": {
+              "type": "string",
+              "description": "Updated preferred language."
+            },
+            "emergency_contact_name": {
+              "type": "string",
+              "description": "Updated emergency contact name."
+            },
+            "emergency_contact_phone": {
+              "type": "string",
+              "description": "Updated emergency contact phone."
+            }
+          },
+          "required": ["patient_id"]
+        }
+      },
+      "server": {
+        "url": "${SERVER_URL}/vapi/tools"
+      }
+    }
+  ]
+}
