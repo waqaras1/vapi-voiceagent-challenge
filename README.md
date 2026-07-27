@@ -1,6 +1,6 @@
 # CareCloud Voice Agent
 
-AI-powered patient intake system for CareCloud Family Health. A caller dials in, speaks with an AI voice agent (Riley), and their demographic information is collected conversationally and persisted to Supabase Postgres. The system uses Vapi for telephony/STT/LLM/TTS and exposes a REST API for direct CRUD access.
+AI-powered patient intake system for CareCloud Family Health. A caller dials in or clicks "Talk to Riley" on the web dashboard, speaks with an AI voice agent (Riley), and their demographic information is collected conversationally and persisted to Supabase Postgres. The system uses Vapi for telephony/STT/LLM/TTS and exposes a REST API for direct CRUD access. A built-in dashboard at the root URL shows registered patients in real time.
 
 ## Architecture
 
@@ -10,9 +10,11 @@ AI-powered patient intake system for CareCloud Family Health. A caller dials in,
 │ (PSTN) │◀────│      LLM/TTS)       │◀────│ /vapi/tools      │◀────│ Postgres      │
 └────────┘     └─────────────────────┘     │ /vapi/events     │     └───────────────┘
                                            │                  │
-                                           │ /patients (REST) │◀──── Admin / Dashboard
-                                           │ /health          │
-                                           │ /agent-prompt    │
+┌────────┐     ┌─────────────────────┐     │ /patients (REST) │◀──── Admin / Dashboard
+│Browser │────▶│ Vapi Web SDK        │────▶│ /health          │
+│Dashboard│◀───│ (WebRTC)            │◀────│ /agent-prompt    │
+└────────┘     └─────────────────────┘     │ /api             │
+                                           │ / (dashboard UI) │
                                            └──────────────────┘
 ```
 
@@ -27,6 +29,7 @@ AI-powered patient intake system for CareCloud Family Health. A caller dials in,
 | **dotenv** | Twelve-factor config from `.env` files |
 | **Supabase Postgres** | Managed Postgres with connection pooling — zero-ops database |
 | **Vapi** | Handles telephony, STT, LLM orchestration, and TTS — we only write the tools |
+| **Vapi Web SDK** | Browser-based WebRTC calls via `@vapi-ai/web` — no phone number needed for demos |
 | **Railway** | One-click deploy from Git with auto-TLS — no infra management |
 
 ## Setup
@@ -97,7 +100,9 @@ All responses use the envelope format:
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `GET` | `/` | Patient dashboard UI (static HTML) |
 | `GET` | `/health` | Health check with DB status |
+| `GET` | `/api` | JSON service index |
 | `GET` | `/agent-prompt` | Voice agent system prompt (text/plain) |
 | `GET` | `/patients` | List patients (newest first, limit 200) |
 | `GET` | `/patients/:id` | Get patient by UUID |
@@ -230,6 +235,17 @@ Key design decisions in the voice agent system prompt:
 
 6. **Digit-by-digit readback** — Phone numbers, DOBs, and ZIP codes are read digit-by-digit to avoid TTS misinterpretation of large numbers.
 
+7. **Field normalisation rules** — The prompt explicitly instructs the LLM to format values to match server expectations: sex as exact enum strings, DOB in `MM/DD/YYYY`, state as two-letter codes (converting "New York" → "NY"), and ZIP as exactly 5 digits. This reduces validation round-trips between agent and server.
+
+## Web Dashboard
+
+The root URL (`/`) serves a single-page patient dashboard (`public/index.html`) with:
+
+- **Patient table** — name, DOB, sex, phone, city/state, ZIP, insurance, created date
+- **Search** — filter by last name or phone number (queries the REST API)
+- **"Talk to Riley" button** — starts a browser-based voice call via the Vapi Web SDK (WebRTC). No phone number needed — useful for demos and testing. The patient table auto-refreshes when the call ends.
+- **Loading, empty, and error states** — handled gracefully with no framework dependencies
+
 ## Known Limitations & Trade-offs
 
 - **In-memory call-to-patient mapping** — The `callId → patientId` map used to attach end-of-call transcripts is stored in-memory. It is lost on server restart, meaning transcripts from calls in progress during a deploy will not be saved. For production, this should be moved to Redis or a database table.
@@ -245,6 +261,8 @@ Key design decisions in the voice agent system prompt:
 - **Phone number as unique identifier** — The partial unique index means only one active patient per phone number. Family members sharing a phone would need the previous record soft-deleted first.
 
 - **No rate limiting** — The API has no rate limiting. In production, add express-rate-limit or similar.
+
+- **Vapi public key in HTML** — The Vapi public key is embedded in `public/index.html`. This is safe (public keys are designed for client-side use) but means changing the key requires a code change and redeploy.
 
 ## Next Steps
 
