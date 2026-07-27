@@ -56,10 +56,4 @@ app.use((err, _req, res, _next) => {
   });
 });
 
-// ─── Start ─────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  app.listen(PORT, () => console.log(`listening on :${PORT}`));
-}
-
 export default app;
