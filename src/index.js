@@ -72,4 +72,10 @@ app.use((err, _req, res, _next) => {
   });
 });
 
+// Start server if run directly (e.g. `node src/index.js` on Render)
+if (process.argv[1] && process.argv[1].endsWith("index.js")) {
+  const port = process.env.PORT || 10000;
+  app.listen(port, "0.0.0.0", () => console.log(`listening on ${port}`));
+}
+
 export default app;
