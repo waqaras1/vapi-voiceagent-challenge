@@ -21,10 +21,16 @@ CREATE TABLE patients (
   emergency_contact_name  text,
   emergency_contact_phone char(10),
   call_transcript     text,
+  call_id             text,
   created_at          timestamptz DEFAULT now(),
   updated_at          timestamptz DEFAULT now(),
   deleted_at          timestamptz
 );
+
+-- Index on call_id for transcript updates
+CREATE INDEX IF NOT EXISTS idx_patients_call_id
+  ON patients (call_id)
+  WHERE call_id IS NOT NULL;
 
 -- Only one active (non-deleted) patient per phone number
 CREATE UNIQUE INDEX idx_patients_phone_active

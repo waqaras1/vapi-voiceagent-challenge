@@ -67,10 +67,15 @@ router.post("/events", async (req, res) => {
     );
 
     const transcript = message.artifact?.transcript;
-    const patientId = callPatientMap.get(callId);
-    if (transcript && patientId) {
+    if (transcript && callId) {
       try {
-        await repo.storeTranscript(patientId, transcript);
+        const updated = await repo.storeTranscriptByCallId(callId, transcript);
+        if (!updated) {
+          const patientId = callPatientMap.get(callId);
+          if (patientId) {
+            await repo.storeTranscript(patientId, transcript);
+          }
+        }
       } catch (err) {
         console.error(`[tool.error] storeTranscript ${err.message}`);
       }
@@ -96,7 +101,8 @@ async function handleLookup({ phone_number }) {
 }
 
 async function handleRegister(args, callId) {
-  const parsed = patientCreate.safeParse(args);
+  const payload = { ...args, ...(callId ? { call_id: callId } : {}) };
+  const parsed = patientCreate.safeParse(payload);
   if (!parsed.success) {
     const invalid_fields = parsed.error.errors.map(
       (e) => `${e.path.join(".")}: ${e.message}`

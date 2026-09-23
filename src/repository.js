@@ -5,7 +5,7 @@ const COLUMNS = [
   "phone_number","email","address_line_1","address_line_2","city",
   "state","zip_code","insurance_provider","insurance_member_id",
   "preferred_language","emergency_contact_name","emergency_contact_phone",
-  "call_transcript","created_at","updated_at","deleted_at",
+  "call_transcript","call_id","created_at","updated_at","deleted_at",
 ];
 
 const SELECT_COLS = COLUMNS.join(", ");
@@ -98,6 +98,14 @@ export async function storeTranscript(patientId, transcript) {
     `UPDATE patients SET call_transcript = $2 WHERE patient_id = $1`,
     [patientId, transcript]
   );
+}
+
+export async function storeTranscriptByCallId(callId, transcript) {
+  const { rowCount } = await pool.query(
+    `UPDATE patients SET call_transcript = $2 WHERE call_id = $1 AND deleted_at IS NULL`,
+    [callId, transcript]
+  );
+  return rowCount > 0;
 }
 
 export async function healthCheck() {

@@ -9,12 +9,32 @@ const US_STATES = [
   "DC",
 ];
 
+const STATE_NAME_TO_CODE = {
+  "ALABAMA": "AL", "ALASKA": "AK", "ARIZONA": "AZ", "ARKANSAS": "AR", "CALIFORNIA": "CA",
+  "COLORADO": "CO", "CONNECTICUT": "CT", "DELAWARE": "DE", "FLORIDA": "FL", "GEORGIA": "GA",
+  "HAWAII": "HI", "IDAHO": "ID", "ILLINOIS": "IL", "INDIANA": "IN", "IOWA": "IA",
+  "KANSAS": "KS", "KENTUCKY": "KY", "LOUISIANA": "LA", "MAINE": "ME", "MARYLAND": "MD",
+  "MASSACHUSETTS": "MA", "MICHIGAN": "MI", "MINNESOTA": "MN", "MISSISSIPPI": "MS", "MISSOURI": "MO",
+  "MONTANA": "MT", "NEBRASKA": "NE", "NEVADA": "NV", "NEW HAMPSHIRE": "NH", "NEW JERSEY": "NJ",
+  "NEW MEXICO": "NM", "NEW YORK": "NY", "NORTH CAROLINA": "NC", "NORTH DAKOTA": "ND", "OHIO": "OH",
+  "OKLAHOMA": "OK", "OREGON": "OR", "PENNSYLVANIA": "PA", "RHODE ISLAND": "RI", "SOUTH CAROLINA": "SC",
+  "SOUTH DAKOTA": "SD", "TENNESSEE": "TN", "TEXAS": "TX", "UTAH": "UT", "VERMONT": "VT",
+  "VIRGINIA": "VA", "WASHINGTON": "WA", "WEST VIRGINIA": "WV", "WISCONSIN": "WI", "WYOMING": "WY",
+  "DISTRICT OF COLUMBIA": "DC"
+};
+
 const nameRegex = /^[A-Za-z][A-Za-z' -]*$/;
 
-// Strip non-digits, then validate 10-digit US number not starting with 0 or 1
+// Strip non-digits, and strip leading country code 1 if 11 digits, then validate 10 digits
 const phoneSchema = z
   .string()
-  .transform((v) => v.replace(/\D/g, ""))
+  .transform((v) => {
+    let digits = v.replace(/\D/g, "");
+    if (digits.length === 11 && digits.startsWith("1")) {
+      digits = digits.slice(1);
+    }
+    return digits;
+  })
   .pipe(
     z
       .string()
@@ -22,16 +42,22 @@ const phoneSchema = z
       .regex(/^[2-9]/, "must not start with 0 or 1")
   );
 
-// Accept MM/DD/YYYY or YYYY-MM-DD; normalise to YYYY-MM-DD; reject future & pre-1900
+// Accept MM/DD/YYYY, MM-DD-YYYY, or YYYY-MM-DD; normalize 2-digit years; reject future & pre-1900
 const dobSchema = z
   .string()
   .transform((v) => {
-    const slashMatch = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    const val = v.trim();
+    const slashMatch = val.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
     if (slashMatch) {
-      const [, mm, dd, yyyy] = slashMatch;
+      let [, mm, dd, yyyy] = slashMatch;
+      if (yyyy.length === 2) {
+        const yr = parseInt(yyyy, 10);
+        const currentYrLast2 = new Date().getFullYear() % 100;
+        yyyy = yr <= currentYrLast2 ? `20${yyyy.padStart(2, "0")}` : `19${yyyy.padStart(2, "0")}`;
+      }
       return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
     }
-    return v;
+    return val;
   })
   .pipe(
     z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "must be MM/DD/YYYY or YYYY-MM-DD")
@@ -75,7 +101,10 @@ export const patientCreate = z
       .max(100, "max 100 characters"),
     state: z
       .string()
-      .transform((v) => v.toUpperCase())
+      .transform((v) => {
+        const clean = v.trim().toUpperCase();
+        return STATE_NAME_TO_CODE[clean] || clean;
+      })
       .pipe(z.enum(US_STATES, { message: "must be a valid US state abbreviation" })),
     zip_code: z
       .string()
@@ -85,6 +114,7 @@ export const patientCreate = z
     preferred_language: z.string().default("English"),
     emergency_contact_name: z.string().nullish().or(z.literal("")),
     emergency_contact_phone: phoneSchema.nullish(),
+    call_id: z.string().nullish().or(z.literal("")),
   })
   .strict();
 
