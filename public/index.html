@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CareCloud — AI Patient Intake & Registry</title>
+<title>CareCloud — Clinical AI Patient Intake & Registry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
     --bg-page: #f8fafc;
     --bg-card: #ffffff;
     --bg-card-subtle: #f1f5f9;
+    --bg-input: #f8fafc;
     --border-color: #e2e8f0;
     --border-hover: #cbd5e1;
     --text-main: #0f172a;
@@ -28,14 +29,33 @@
     --danger: #ef4444;
     --danger-light: #fee2e2;
     --warning: #f59e0b;
-    --warning-light: #fef3c7;
     
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
     --shadow-lg: 0 10px 25px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
+  }
+
+  [data-theme="dark"] {
+    --bg-page: #0b0f17;
+    --bg-card: #111827;
+    --bg-card-subtle: #1e293b;
+    --bg-input: #1e293b;
+    --border-color: #1f2937;
+    --border-hover: #374151;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-faint: #64748b;
+    
+    --primary: #38bdf8;
+    --primary-hover: #0ea5e9;
+    --primary-light: rgba(56, 189, 248, 0.15);
+    
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 12px 30px -4px rgb(0 0 0 / 0.6);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,6 +68,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: background-color 0.2s ease, color 0.2s ease;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -62,9 +83,9 @@
   }
 
   .header-inner {
-    max-width: 1400px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 14px 24px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -81,29 +102,33 @@
   }
 
   .brand-logo {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
   }
 
   .brand-text h1 {
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.02em;
-    color: var(--text-main);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .brand-text h1 span {
+    color: var(--primary);
+    font-weight: 600;
   }
 
   .brand-text p {
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--text-muted);
     font-weight: 500;
   }
@@ -111,7 +136,8 @@
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .status-pill {
@@ -135,7 +161,6 @@
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
     animation: pulse-ring 2s infinite;
   }
-
   .pulse-dot.error { background: var(--danger); animation: none; }
 
   @keyframes pulse-ring {
@@ -159,6 +184,7 @@
     transition: all 0.15s ease;
     text-decoration: none;
     font-family: inherit;
+    white-space: nowrap;
   }
 
   .btn-primary {
@@ -188,7 +214,7 @@
   }
 
   .btn-secondary {
-    background: #fff;
+    background: var(--bg-card);
     color: var(--text-main);
     border-color: var(--border-color);
   }
@@ -199,66 +225,119 @@
     color: var(--text-muted);
   }
   .btn-ghost:hover { background: var(--bg-card-subtle); color: var(--text-main); }
-
   .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: var(--radius-sm); }
+  .btn-icon { padding: 8px; width: 36px; height: 36px; border-radius: var(--radius-md); }
 
-  /* ── Active Voice Call Banner ──────────────────────────── */
-  .call-banner {
+  /* ── Interactive AI Voice Orb Banner ───────────────────── */
+  .voice-stage {
     background: linear-gradient(135deg, #090e17 0%, #0f172a 100%);
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 16px 24px;
+    padding: 24px;
     display: none;
-    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    animation: stageIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .call-banner.active { display: block; }
+  .voice-stage.active { display: block; }
 
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
+  @keyframes stageIn {
+    from { opacity: 0; transform: translateY(-12px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .call-banner-inner {
-    max-width: 1400px;
+  .voice-stage-inner {
+    max-width: 1440px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 28px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
   }
 
-  .call-agent-info {
+  .orb-and-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 22px;
   }
 
-  .agent-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+  /* ── The Morphing Voice Orb ────────────────────────────── */
+  .orb-container {
+    position: relative;
+    width: 68px;
+    height: 68px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
   }
 
-  .call-details h3 {
-    font-size: 15px;
-    font-weight: 700;
+  .voice-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #2563eb 45%, #6366f1 80%, #a855f7 100%);
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.4);
+    animation: orb-idle 4s ease-in-out infinite;
+    transition: all 0.3s ease;
+  }
+
+  .orb-halo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.3);
+    animation: orb-halo-pulse 2.5s infinite;
+  }
+
+  .voice-stage.speaking .voice-orb {
+    animation: orb-speaking 0.8s ease-in-out infinite alternate;
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.85), inset 0 0 20px rgba(255, 255, 255, 0.7);
+  }
+
+  .voice-stage.listening .voice-orb {
+    animation: orb-listening 1.8s ease-in-out infinite alternate;
+    background: radial-gradient(circle at 35% 35%, #34d399 0%, #059669 45%, #0284c7 100%);
+    box-shadow: 0 0 35px rgba(52, 211, 153, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5);
+  }
+
+  @keyframes orb-idle {
+    0%, 100% { transform: scale(1) rotate(0deg); border-radius: 50%; }
+    50% { transform: scale(1.05) rotate(180deg); border-radius: 46% 54% 52% 48% / 48% 52% 48% 52%; }
+  }
+
+  @keyframes orb-speaking {
+    0% { transform: scale(0.95); filter: hue-rotate(0deg); }
+    100% { transform: scale(1.18); filter: hue-rotate(30deg); }
+  }
+
+  @keyframes orb-listening {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
+  }
+
+  @keyframes orb-halo-pulse {
+    0% { transform: scale(0.85); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  .call-stage-details h3 {
+    font-size: 17px;
+    font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    letter-spacing: -0.01em;
   }
 
   .call-status-badge {
     font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 9999px;
     background: rgba(16, 185, 129, 0.2);
     color: #34d399;
@@ -268,56 +347,33 @@
   .call-timer {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    color: var(--text-faint);
+    color: #94a3b8;
+    margin-top: 3px;
   }
 
-  .waveform {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 24px;
-  }
-
-  .waveform-bar {
-    width: 3px;
-    height: 100%;
-    background: #38bdf8;
-    border-radius: 2px;
-    animation: wave 1.2s ease-in-out infinite alternate;
-  }
-  .waveform-bar:nth-child(2) { animation-delay: 0.15s; }
-  .waveform-bar:nth-child(3) { animation-delay: 0.3s; }
-  .waveform-bar:nth-child(4) { animation-delay: 0.45s; }
-  .waveform-bar:nth-child(5) { animation-delay: 0.6s; }
-
-  @keyframes wave {
-    0% { height: 4px; opacity: 0.3; }
-    100% { height: 24px; opacity: 1; }
-  }
-
-  .live-transcript-box {
-    width: 100%;
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .live-caption-pill {
+    max-width: 650px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-md);
-    font-size: 13px;
-    color: #e2e8f0;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    color: #f1f5f9;
     font-style: italic;
     display: none;
+    line-height: 1.5;
   }
 
   /* ── Layout & Content ──────────────────────────────────── */
   main {
-    max-width: 1400px;
+    max-width: 1440px;
     width: 100%;
     margin: 0 auto;
-    padding: 28px 24px 60px;
+    padding: 24px;
     flex: 1;
   }
 
-  /* ── Stat Cards ────────────────────────────────────────── */
+  /* ── Stats Grid ────────────────────────────────────────── */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -339,45 +395,51 @@
   .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
   .stat-icon {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 22px;
     flex-shrink: 0;
   }
-  .stat-icon.blue { background: #e0f2fe; color: #0284c7; }
-  .stat-icon.green { background: #dcfce7; color: #16a34a; }
-  .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
-  .stat-icon.amber { background: #fef3c7; color: #d97706; }
+  .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+  .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+  .stat-icon.purple { background: rgba(147, 51, 234, 0.15); color: #a855f7; }
+  .stat-icon.amber { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
 
-  .stat-content .stat-label {
-    font-size: 12px;
-    font-weight: 600;
+  .stat-label {
+    font-size: 11.5px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     color: var(--text-muted);
     margin-bottom: 4px;
   }
 
-  .stat-content .stat-value {
-    font-size: 24px;
+  .stat-value {
+    font-size: 26px;
     font-weight: 800;
     color: var(--text-main);
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
 
-  /* ── Action & Filter Toolbar ───────────────────────────── */
-  .toolbar {
+  /* ── Toolbar & Filter Chips ────────────────────────────── */
+  .toolbar-wrapper {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 16px 20px;
     box-shadow: var(--shadow-sm);
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .toolbar-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -388,7 +450,7 @@
   .search-box {
     position: relative;
     flex: 1;
-    min-width: 260px;
+    min-width: 280px;
   }
 
   .search-box svg {
@@ -402,10 +464,10 @@
 
   .search-input {
     width: 100%;
-    background: var(--bg-card-subtle);
+    background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 10px 14px 10px 40px;
+    padding: 10px 14px 10px 42px;
     font-size: 13.5px;
     font-family: inherit;
     color: var(--text-main);
@@ -415,28 +477,65 @@
   .search-input:focus {
     outline: none;
     border-color: var(--primary);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
   }
 
-  .filter-group {
+  .kbd-hint {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--border-color);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  .toolbar-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
-  .filter-select {
-    background: var(--bg-card-subtle);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 9px 12px;
-    font-size: 13px;
-    font-family: inherit;
-    color: var(--text-main);
-    cursor: pointer;
+  .chip-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
-  .filter-select:focus { outline: none; border-color: var(--primary); }
+
+  .chip {
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg-card-subtle);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--border-hover); color: var(--text-main); }
+  .chip.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .live-sync-indicator {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
   /* ── Table Card ────────────────────────────────────────── */
   .table-card {
@@ -448,16 +547,15 @@
   }
 
   .table-header-meta {
-    padding: 16px 20px;
+    padding: 16px 22px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #fff;
   }
 
   .table-header-meta h2 {
-    font-size: 15px;
+    font-size: 15.5px;
     font-weight: 700;
   }
 
@@ -472,19 +570,19 @@
   }
 
   th {
-    background: #f8fafc;
+    background: var(--bg-card-subtle);
     color: var(--text-muted);
     font-size: 11.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 12px 18px;
+    padding: 13px 20px;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
   }
 
   td {
-    padding: 14px 18px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
     font-size: 13.5px;
@@ -498,10 +596,19 @@
   }
 
   tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--bg-card-subtle);
   }
 
-  /* ── Table Elements ────────────────────────────────────── */
+  tr.highlight-new {
+    animation: newRowGlow 2.5s ease;
+  }
+
+  @keyframes newRowGlow {
+    0% { background-color: rgba(16, 185, 129, 0.25); }
+    100% { background-color: transparent; }
+  }
+
+  /* ── Patient Cell & Badges ─────────────────────────────── */
   .patient-cell {
     display: flex;
     align-items: center;
@@ -509,8 +616,8 @@
   }
 
   .patient-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
     color: #4338ca;
@@ -540,32 +647,39 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
+    gap: 4px;
+    padding: 3px 9px;
     border-radius: 9999px;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
     white-space: nowrap;
   }
 
-  .badge-blue { background: #e0f2fe; color: #0369a1; }
-  .badge-purple { background: #f3e8ff; color: #7e22ce; }
-  .badge-green { background: #dcfce7; color: #15803d; }
-  .badge-gray { background: #f1f5f9; color: #475569; }
+  .badge-blue { background: rgba(56, 189, 248, 0.15); color: #0284c7; }
+  [data-theme="dark"] .badge-blue { color: #38bdf8; }
+  
+  .badge-purple { background: rgba(168, 85, 247, 0.15); color: #9333ea; }
+  [data-theme="dark"] .badge-purple { color: #c084fc; }
+  
+  .badge-green { background: rgba(16, 185, 129, 0.15); color: #059669; }
+  [data-theme="dark"] .badge-green { color: #34d399; }
+  
+  .badge-gray { background: var(--bg-card-subtle); color: var(--text-muted); }
 
   .mono {
     font-family: 'JetBrains Mono', monospace;
     font-size: 12.5px;
   }
 
-  /* ── Empty & Loading States ────────────────────────────── */
+  /* ── Empty State ───────────────────────────────────────── */
   .empty-state {
-    padding: 60px 24px;
+    padding: 64px 24px;
     text-align: center;
   }
 
   .empty-icon {
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
     margin: 0 auto 16px;
     background: var(--bg-card-subtle);
     border-radius: 50%;
@@ -573,42 +687,43 @@
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    font-size: 28px;
+    font-size: 30px;
   }
 
   .empty-state h3 {
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 700;
     margin-bottom: 6px;
   }
 
   .empty-state p {
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--text-muted);
-    max-width: 400px;
+    max-width: 440px;
     margin: 0 auto 20px;
+    line-height: 1.5;
   }
 
-  /* ── Drawer & Modal (Dialog) ───────────────────────────── */
+  /* ── Modals (<dialog>) ─────────────────────────────────── */
   dialog {
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    background: #fff;
+    background: var(--bg-card);
     box-shadow: var(--shadow-lg);
     margin: auto;
     padding: 0;
-    max-width: 580px;
+    max-width: 620px;
     width: 90vw;
-    color: inherit;
+    color: var(--text-main);
   }
 
   dialog::backdrop {
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(5px);
   }
 
   .dialog-header {
-    padding: 20px 24px;
+    padding: 18px 24px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -616,13 +731,13 @@
   }
 
   .dialog-header h3 {
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 17.5px;
+    font-weight: 800;
   }
 
   .dialog-body {
     padding: 24px;
-    max-height: 75vh;
+    max-height: 72vh;
     overflow-y: auto;
   }
 
@@ -630,6 +745,7 @@
     padding: 16px 24px;
     border-top: 1px solid var(--border-color);
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: 12px;
     background: var(--bg-card-subtle);
@@ -649,32 +765,58 @@
     text-transform: uppercase;
     color: var(--text-muted);
     margin-bottom: 4px;
+    letter-spacing: 0.04em;
   }
 
   .detail-item .val {
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--text-main);
   }
 
+  /* ── Transcript Chat Bubbles ───────────────────────────── */
   .transcript-section {
-    margin-top: 20px;
+    margin-top: 22px;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
   }
 
-  .transcript-box {
+  .chat-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px;
+  }
+
+  .chat-msg {
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 85%;
+  }
+
+  .chat-msg.riley {
+    align-self: flex-start;
     background: var(--bg-card-subtle);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 14px;
-    max-height: 200px;
-    overflow-y: auto;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-main);
-    white-space: pre-wrap;
-    font-family: inherit;
+    border-bottom-left-radius: 2px;
+  }
+
+  .chat-msg.caller {
+    align-self: flex-end;
+    background: var(--primary);
+    color: #fff;
+    border-bottom-right-radius: 2px;
+  }
+
+  .msg-role {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    opacity: 0.8;
   }
 
   /* ── Form Controls ─────────────────────────────────────── */
@@ -696,16 +838,17 @@
   .form-control {
     width: 100%;
     padding: 9px 12px;
-    font-size: 13px;
+    font-size: 13.5px;
     font-family: inherit;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: var(--bg-input);
     color: var(--text-main);
+    transition: border-color 0.15s ease;
   }
   .form-control:focus { outline: none; border-color: var(--primary); }
 
-  /* ── Toast Notifications ───────────────────────────────── */
+  /* ── Toasts ────────────────────────────────────────────── */
   #toast-container {
     position: fixed;
     bottom: 24px;
@@ -737,13 +880,55 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* ── Footer ────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-card);
+    padding: 14px 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .footer-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .shortcuts-guide {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .shortcut-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .shortcut-tag kbd {
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-main);
+  }
+
   @media (max-width: 768px) {
     .header-inner { flex-direction: column; align-items: stretch; }
     .header-actions { justify-content: space-between; }
     .stats-grid { grid-template-columns: 1fr; }
-    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-top { flex-direction: column; align-items: stretch; }
     .detail-grid, .form-grid { grid-template-columns: 1fr; }
     .form-full { grid-column: span 1; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
@@ -761,17 +946,24 @@
         </svg>
       </div>
       <div class="brand-text">
-        <h1>CareCloud <span>Registry</span></h1>
+        <h1>CareCloud <span>Intake</span></h1>
         <p>AI Clinical Intake Coordinator</p>
       </div>
     </a>
 
     <div class="header-actions">
+      <!-- Database Status -->
       <div class="status-pill" id="db-status-pill" title="Live Database Health">
         <div class="pulse-dot" id="db-pulse"></div>
-        <span id="db-status-text">Postgres: Connecting…</span>
+        <span id="db-status-text">Neon DB: Connected</span>
       </div>
 
+      <!-- Theme Switcher -->
+      <button id="theme-btn" class="btn btn-secondary btn-icon" title="Toggle Dark/Light Mode">
+        <span id="theme-icon">🌙</span>
+      </button>
+
+      <!-- Talk to Riley -->
       <button id="call-btn" class="btn btn-call">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -779,6 +971,7 @@
         <span id="call-btn-text">Talk to Riley</span>
       </button>
 
+      <!-- Manual Intake -->
       <button id="manual-btn" class="btn btn-secondary">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12h14"/>
@@ -790,30 +983,26 @@
   </div>
 </header>
 
-<!-- ─── Interactive AI Voice Call Banner ─────────────────── -->
-<div id="call-banner" class="call-banner">
-  <div class="call-banner-inner">
-    <div class="call-agent-info">
-      <div class="agent-avatar">🎙️</div>
-      <div class="call-details">
-        <h3>Riley (Intake Specialist) <span class="call-status-badge" id="call-status">Connecting…</span></h3>
-        <p class="call-timer" id="call-duration">Call duration: 00:00</p>
+<!-- ─── Morphing AI Voice Orb Stage ──────────────────────── -->
+<div id="voice-stage" class="voice-stage">
+  <div class="voice-stage-inner">
+    <div class="orb-and-info">
+      <div class="orb-container">
+        <div class="orb-halo"></div>
+        <div class="voice-orb"></div>
+      </div>
+      <div class="call-stage-details">
+        <h3>Riley <span class="call-status-badge" id="call-status">Connecting…</span></h3>
+        <p class="call-timer" id="call-duration">Call Duration: 00:00</p>
       </div>
     </div>
 
-    <div class="waveform" id="waveform">
-      <div class="waveform-bar"></div>
-      <div class="waveform-bar"></div>
-      <div class="waveform-bar"></div>
-      <div class="waveform-bar"></div>
-      <div class="waveform-bar"></div>
-    </div>
+    <div class="live-caption-pill" id="live-caption"></div>
 
-    <button id="banner-end-call-btn" class="btn btn-sm btn-call in-call">
-      End Call
+    <button id="stage-end-call-btn" class="btn btn-call in-call">
+      End Voice Call
     </button>
   </div>
-  <div class="live-transcript-box" id="live-transcript"></div>
 </div>
 
 <!-- ─── Main Content ─────────────────────────────────────── -->
@@ -837,61 +1026,76 @@
     <div class="stat-card">
       <div class="stat-icon purple">🛡️</div>
       <div class="stat-content">
-        <div class="stat-label">Insured Patients</div>
+        <div class="stat-label">Insured Coverage</div>
         <div class="stat-value" id="stat-insured">0%</div>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon amber">⚡</div>
+      <div class="stat-icon amber">🎙️</div>
       <div class="stat-content">
-        <div class="stat-label">Riley Voice AI</div>
-        <div class="stat-value" style="font-size: 18px; color: #16a34a;">Ready &amp; Active</div>
+        <div class="stat-label">Voice Intake Agent</div>
+        <div class="stat-value" style="font-size: 18px; color: #10b981;">Riley Active</div>
       </div>
     </div>
   </div>
 
   <!-- Search & Toolbar -->
-  <div class="toolbar">
-    <div class="search-box">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.3-4.3"/>
-      </svg>
-      <input type="text" id="q-search" class="search-input" placeholder="Search by name, phone, or location…" />
+  <div class="toolbar-wrapper">
+    <div class="toolbar-top">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="text" id="q-search" class="search-input" placeholder="Search patients by name, phone, city, or insurance…" />
+        <span class="kbd-hint">/</span>
+      </div>
+
+      <div class="toolbar-actions">
+        <!-- Quick Demo Generator -->
+        <button id="btn-demo-intake" class="btn btn-secondary btn-sm" title="Generate Sample Intake">
+          ⚡ Quick Demo Intake
+        </button>
+
+        <button id="btn-export" class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+
+        <button id="btn-refresh" class="btn btn-ghost btn-sm btn-icon" title="Refresh (R)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 21h5v-5"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <div class="filter-group">
-      <select id="filter-sex" class="filter-select">
-        <option value="">All Genders</option>
-        <option value="Female">Female</option>
-        <option value="Male">Male</option>
-        <option value="Other">Other</option>
-      </select>
+    <!-- Filter Chips Row -->
+    <div class="chip-row">
+      <div class="chip active" data-filter="all">All Patients</div>
+      <div class="chip" data-filter="today">Registered Today</div>
+      <div class="chip" data-filter="transcript">With Transcript 🎙️</div>
+      <div class="chip" data-filter="insured">Insured Only</div>
+      <div class="chip" data-filter="selfpay">Self-Pay</div>
 
-      <button id="btn-export" class="btn btn-secondary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Export CSV
-      </button>
-
-      <button id="btn-refresh" class="btn btn-ghost" title="Refresh Registry">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-          <path d="M3 3v5h5"/>
-          <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-          <path d="M16 21h5v-5"/>
-        </svg>
-      </button>
+      <div class="live-sync-indicator">
+        <span class="pulse-dot" style="width:6px; height:6px;"></span>
+        <span>Auto-Sync: Live</span>
+      </div>
     </div>
   </div>
 
   <!-- Table Card -->
   <div class="table-card">
     <div class="table-header-meta">
-      <h2>Registered Patient Roster</h2>
+      <h2>Patient Registry</h2>
       <span class="mono" id="table-count" style="font-size: 12px; color: var(--text-muted);">0 Records</span>
     </div>
 
@@ -905,7 +1109,7 @@
             <th>Phone Number</th>
             <th>Location</th>
             <th>Insurance Carrier</th>
-            <th>Registration Date</th>
+            <th>Source</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -913,26 +1117,34 @@
       </table>
     </div>
 
-    <!-- Empty / State Message -->
+    <!-- Empty State -->
     <div id="empty-state" class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h3 id="empty-title">No patients registered yet</h3>
-      <p id="empty-desc">Click "Talk to Riley" above to initiate an automated intake call, or add a patient record manually.</p>
-      <button class="btn btn-primary" onclick="openManualIntake()">+ Add First Patient</button>
+      <div class="empty-icon">🩺</div>
+      <h3 id="empty-title">No patients in registry</h3>
+      <p id="empty-desc">Click "Talk to Riley" above to initiate an automated intake call, or generate a quick demo intake.</p>
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button class="btn btn-primary" onclick="openManualIntake()">+ Manual Intake</button>
+        <button class="btn btn-secondary" onclick="generateDemoPatient()">⚡ Quick Demo Intake</button>
+      </div>
     </div>
   </div>
 </main>
 
-<!-- ─── Patient Details Dialog ───────────────────────────── -->
+<!-- ─── Patient Details & Edit Dialog ────────────────────── -->
 <dialog id="patient-dialog">
   <div class="dialog-header">
     <div>
-      <h3 id="modal-patient-name">Patient Details</h3>
+      <h3 id="modal-patient-name">Patient Chart</h3>
       <p style="font-size: 12px; color: var(--text-muted);" id="modal-patient-id"></p>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="closePatientDialog()">✕</button>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary btn-sm" id="btn-toggle-edit">Edit Chart</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePatientDialog()">✕</button>
+    </div>
   </div>
-  <div class="dialog-body">
+
+  <!-- View Mode -->
+  <div id="view-mode-body" class="dialog-body">
     <div class="detail-grid">
       <div class="detail-item">
         <label>Date of Birth</label>
@@ -950,16 +1162,12 @@
         <label>Email Address</label>
         <div class="val" id="d-email">—</div>
       </div>
-      <div class="detail-item">
+      <div class="detail-item form-full">
         <label>Residential Address</label>
         <div class="val" id="d-address">—</div>
       </div>
       <div class="detail-item">
-        <label>Preferred Language</label>
-        <div class="val" id="d-lang">English</div>
-      </div>
-      <div class="detail-item">
-        <label>Insurance Provider</label>
+        <label>Insurance Carrier</label>
         <div class="val" id="d-insurance">—</div>
       </div>
       <div class="detail-item">
@@ -971,21 +1179,75 @@
         <div class="val" id="d-emergency">—</div>
       </div>
       <div class="detail-item">
-        <label>Emergency Phone</label>
-        <div class="val mono" id="d-emergency-phone">—</div>
+        <label>Preferred Language</label>
+        <div class="val" id="d-lang">English</div>
       </div>
     </div>
 
+    <!-- Transcript Section -->
     <div class="transcript-section" id="transcript-container" style="display:none;">
-      <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-        <span>🎙️ Riley Intake Call Transcript</span>
+      <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span>🎙️ Riley Voice Intake Dialogue</span>
       </h4>
-      <div class="transcript-box" id="d-transcript"></div>
+      <div class="chat-stream" id="transcript-stream"></div>
     </div>
   </div>
-  <div class="dialog-footer">
+
+  <!-- Edit Mode -->
+  <form id="edit-patient-form" onsubmit="handleEditSubmit(event)" style="display:none;">
+    <div class="dialog-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" name="first_name" id="e-first-name" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" name="last_name" id="e-last-name" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" name="phone_number" id="e-phone" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" id="e-email" class="form-control" />
+        </div>
+        <div class="form-group form-full">
+          <label>Street Address *</label>
+          <input type="text" name="address_line_1" id="e-address" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" name="city" id="e-city" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>State (2 letters) *</label>
+          <input type="text" name="state" id="e-state" required maxlength="2" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>ZIP Code *</label>
+          <input type="text" name="zip_code" id="e-zip" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Insurance Provider</label>
+          <input type="text" name="insurance_provider" id="e-insurance" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Member ID</label>
+          <input type="text" name="insurance_member_id" id="e-member-id" class="form-control" />
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-secondary" onclick="toggleEditMode(false)">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="btn-save-edit">Save Changes</button>
+    </div>
+  </form>
+
+  <div class="dialog-footer" id="view-mode-footer">
     <button class="btn btn-ghost btn-sm" id="btn-delete-patient" style="color: var(--danger); margin-right: auto;">
-      Delete Patient
+      Archive Record
     </button>
     <button class="btn btn-secondary btn-sm" onclick="closePatientDialog()">Close</button>
   </div>
@@ -994,7 +1256,7 @@
 <!-- ─── Manual Intake Dialog ─────────────────────────────── -->
 <dialog id="manual-dialog">
   <div class="dialog-header">
-    <h3>New Patient Registration</h3>
+    <h3>Manual Patient Intake</h3>
     <button class="btn btn-ghost btn-sm" onclick="closeManualIntake()">✕</button>
   </div>
   <form id="manual-intake-form" onsubmit="handleManualSubmit(event)">
@@ -1002,21 +1264,21 @@
       <div class="form-grid">
         <div class="form-group">
           <label>First Name *</label>
-          <input type="text" name="first_name" required class="form-control" placeholder="e.g. John" />
+          <input type="text" name="first_name" required class="form-control" placeholder="e.g. Michael" />
         </div>
         <div class="form-group">
           <label>Last Name *</label>
-          <input type="text" name="last_name" required class="form-control" placeholder="e.g. Doe" />
+          <input type="text" name="last_name" required class="form-control" placeholder="e.g. Scott" />
         </div>
         <div class="form-group">
           <label>Date of Birth * (MM/DD/YYYY)</label>
-          <input type="text" name="date_of_birth" required class="form-control" placeholder="10/24/1985" pattern="^(\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2})$" />
+          <input type="text" name="date_of_birth" required class="form-control" placeholder="03/15/1975" />
         </div>
         <div class="form-group">
-          <label>Sex *</label>
+          <label>Legal Sex *</label>
           <select name="sex" required class="form-control">
-            <option value="Female">Female</option>
             <option value="Male">Male</option>
+            <option value="Female">Female</option>
             <option value="Other">Other</option>
             <option value="Decline to Answer">Decline to Answer</option>
           </select>
@@ -1026,38 +1288,38 @@
           <input type="tel" name="phone_number" required class="form-control" placeholder="5551234567" />
         </div>
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" name="email" class="form-control" placeholder="john@example.com" />
+          <label>Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="michael@dundermifflin.com" />
         </div>
         <div class="form-group form-full">
           <label>Street Address *</label>
-          <input type="text" name="address_line_1" required class="form-control" placeholder="123 Main St, Apt 4" />
+          <input type="text" name="address_line_1" required class="form-control" placeholder="1725 Slough Avenue" />
         </div>
         <div class="form-group">
           <label>City *</label>
-          <input type="text" name="city" required class="form-control" placeholder="Dallas" />
+          <input type="text" name="city" required class="form-control" placeholder="Scranton" />
         </div>
         <div class="form-group">
-          <label>State (2 letters) *</label>
-          <input type="text" name="state" required maxlength="2" class="form-control" placeholder="TX" style="text-transform:uppercase;" />
+          <label>State *</label>
+          <input type="text" name="state" required class="form-control" placeholder="PA" />
         </div>
         <div class="form-group">
           <label>ZIP Code *</label>
-          <input type="text" name="zip_code" required class="form-control" placeholder="75201" />
+          <input type="text" name="zip_code" required class="form-control" placeholder="18503" />
         </div>
         <div class="form-group">
-          <label>Insurance Provider</label>
+          <label>Insurance Carrier</label>
           <input type="text" name="insurance_provider" class="form-control" placeholder="Blue Cross" />
         </div>
         <div class="form-group">
-          <label>Insurance Member ID</label>
-          <input type="text" name="insurance_member_id" class="form-control" placeholder="XEA98234" />
+          <label>Member ID</label>
+          <input type="text" name="insurance_member_id" class="form-control" placeholder="DM-998822" />
         </div>
       </div>
     </div>
     <div class="dialog-footer">
       <button type="button" class="btn btn-secondary" onclick="closeManualIntake()">Cancel</button>
-      <button type="submit" class="btn btn-primary" id="btn-save-patient">Save Patient</button>
+      <button type="submit" class="btn btn-primary" id="btn-save-patient">Submit Intake</button>
     </div>
   </form>
 </dialog>
@@ -1065,11 +1327,48 @@
 <!-- ─── Toast Container ──────────────────────────────────── -->
 <div id="toast-container"></div>
 
-<!-- ─── Application Logic ────────────────────────────────── -->
+<!-- ─── Footer with Keyboard Shortcuts ───────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div>CareCloud Clinical Voice AI Platform • Neon Serverless Postgres</div>
+    <div class="shortcuts-guide">
+      <span class="shortcut-tag"><kbd>/</kbd> Search</span>
+      <span class="shortcut-tag"><kbd>N</kbd> New Intake</span>
+      <span class="shortcut-tag"><kbd>R</kbd> Refresh</span>
+      <span class="shortcut-tag"><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── Main Javascript Logic ────────────────────────────── -->
 <script>
   let patientsData = [];
   let currentViewingId = null;
+  let activeFilterChip = 'all';
+  let previousPatientIds = new Set();
+  let isEditing = false;
 
+  // ── Dark / Light Mode Theme System ────────────────────────
+  const themeBtn = document.getElementById('theme-btn');
+  const themeIcon = document.getElementById('theme-icon');
+
+  function initTheme() {
+    const saved = localStorage.getItem('carecloud_theme') || 'light';
+    setTheme(saved);
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('carecloud_theme', theme);
+    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  themeBtn.onclick = () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  };
+
+  // ── Toast System ──────────────────────────────────────────
   function toast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
@@ -1087,9 +1386,7 @@
   function fmtPhone(phone) {
     if (!phone) return '—';
     const clean = phone.replace(/\D/g, '');
-    if (clean.length === 10) {
-      return `(${clean.slice(0, 3)}) ${clean.slice(3, 6)}-${clean.slice(6)}`;
-    }
+    if (clean.length === 10) return `(${clean.slice(0, 3)}) ${clean.slice(3, 6)}-${clean.slice(6)}`;
     return phone;
   }
 
@@ -1134,30 +1431,48 @@
     }
   }
 
-  // ── Load Patient Registry ─────────────────────────────────
-  async function fetchPatients() {
+  // ── Fetch Patients with Auto-Highlight ────────────────────
+  async function fetchPatients(silent = false) {
     try {
       const res = await fetch('/patients');
       const json = await res.json();
       if (!res.ok || json.error) throw new Error(json.error?.message || `HTTP ${res.status}`);
-      patientsData = json.data || [];
-      renderTable();
+      
+      const newPatients = json.data || [];
+
+      // Detect newly added patients during live polling
+      const newIds = [];
+      if (previousPatientIds.size > 0) {
+        newPatients.forEach(p => {
+          if (!previousPatientIds.has(p.patient_id)) {
+            newIds.push(p);
+          }
+        });
+      }
+
+      patientsData = newPatients;
+      previousPatientIds = new Set(newPatients.map(p => p.patient_id));
+
+      renderTable(newIds.map(p => p.patient_id));
       updateMetrics();
+
+      if (newIds.length > 0) {
+        toast(`✨ New patient registered: ${newIds[0].first_name} ${newIds[0].last_name}`);
+      }
     } catch (err) {
-      console.error(err);
-      toast('Failed to load patient records: ' + err.message, 'error');
+      if (!silent) {
+        console.error(err);
+        toast('Failed to load patient records: ' + err.message, 'error');
+      }
     }
   }
 
   function updateMetrics() {
     document.getElementById('stat-total').textContent = patientsData.length;
-    
-    // Today
     const today = new Date().toISOString().slice(0, 10);
     const countToday = patientsData.filter(p => (p.created_at || '').startsWith(today)).length;
     document.getElementById('stat-today').textContent = countToday;
 
-    // Insured %
     if (patientsData.length > 0) {
       const insuredCount = patientsData.filter(p => p.insurance_provider && p.insurance_provider.trim() !== '').length;
       const pct = Math.round((insuredCount / patientsData.length) * 100);
@@ -1167,18 +1482,23 @@
     }
   }
 
-  function renderTable() {
+  function renderTable(highlightIds = []) {
     const q = document.getElementById('q-search').value.toLowerCase().trim();
-    const sexFilter = document.getElementById('filter-sex').value;
+    const today = new Date().toISOString().slice(0, 10);
 
     const filtered = patientsData.filter(p => {
-      const matchesSex = !sexFilter || p.sex === sexFilter;
-      const matchesQ = !q || 
-        `${p.first_name} ${p.last_name}`.toLowerCase().includes(q) ||
+      // Smart Filter Chips
+      if (activeFilterChip === 'today' && !(p.created_at || '').startsWith(today)) return false;
+      if (activeFilterChip === 'transcript' && !p.call_transcript) return false;
+      if (activeFilterChip === 'insured' && (!p.insurance_provider || p.insurance_provider.trim() === '')) return false;
+      if (activeFilterChip === 'selfpay' && (p.insurance_provider && p.insurance_provider.trim() !== '')) return false;
+
+      // Search Query
+      if (!q) return true;
+      return `${p.first_name} ${p.last_name}`.toLowerCase().includes(q) ||
         (p.phone_number || '').includes(q) ||
         (p.city || '').toLowerCase().includes(q) ||
         (p.insurance_provider || '').toLowerCase().includes(q);
-      return matchesSex && matchesQ;
     });
 
     const tbody = document.getElementById('tbody');
@@ -1191,7 +1511,7 @@
       emptyState.style.display = 'block';
       if (patientsData.length > 0) {
         document.getElementById('empty-title').textContent = 'No matching patients';
-        document.getElementById('empty-desc').textContent = 'Try adjusting your search terms or filter criteria.';
+        document.getElementById('empty-desc').textContent = 'Try clearing your search query or selecting a different filter chip.';
       }
       return;
     }
@@ -1202,15 +1522,17 @@
     tbody.innerHTML = filtered.map(p => {
       const initials = `${(p.first_name || '')[0] || ''}${(p.last_name || '')[0] || ''}`.toUpperCase();
       const sexClass = p.sex === 'Female' ? 'badge-purple' : (p.sex === 'Male' ? 'badge-blue' : 'badge-gray');
-      
+      const isNew = highlightIds.includes(p.patient_id) ? 'highlight-new' : '';
+      const hasTranscript = Boolean(p.call_transcript);
+
       return `
-        <tr onclick="viewPatient('${p.patient_id}')">
+        <tr class="${isNew}" onclick="viewPatient('${p.patient_id}')">
           <td>
             <div class="patient-cell">
               <div class="patient-avatar">${initials}</div>
               <div class="patient-name-block">
                 <strong>${esc(p.first_name)} ${esc(p.last_name)}</strong>
-                <span>${esc(p.email || 'No email on file')}</span>
+                <span>${esc(p.email || 'No email')}</span>
               </div>
             </div>
           </td>
@@ -1221,7 +1543,9 @@
           <td>
             ${p.insurance_provider ? `<span class="badge badge-green">${esc(p.insurance_provider)}</span>` : '<span style="color:var(--text-faint);">Self-pay</span>'}
           </td>
-          <td style="color:var(--text-muted);font-size:12.5px;">${fmtDate(p.created_at)}</td>
+          <td>
+            ${hasTranscript ? `<span class="badge badge-blue">🎙️ Riley AI</span>` : `<span class="badge badge-gray">✍️ Manual</span>`}
+          </td>
           <td>
             <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); viewPatient('${p.patient_id}')">
               Chart ↗
@@ -1232,9 +1556,11 @@
     }).join('');
   }
 
-  // ── Patient Detail Modal ──────────────────────────────────
+  // ── Patient Detail & Transcript Formatter ─────────────────
   async function viewPatient(id) {
     currentViewingId = id;
+    toggleEditMode(false);
+
     try {
       const res = await fetch(`/patients/${id}`);
       const json = await res.json();
@@ -1242,7 +1568,7 @@
       const p = json.data;
 
       document.getElementById('modal-patient-name').textContent = `${p.first_name} ${p.last_name}`;
-      document.getElementById('modal-patient-id').textContent = `ID: ${p.patient_id} • Registered ${fmtDate(p.created_at)}`;
+      document.getElementById('modal-patient-id').textContent = `Chart ID: ${p.patient_id} • Registered ${fmtDate(p.created_at)}`;
       
       document.getElementById('d-dob').textContent = `${fmtDate(p.date_of_birth)}${getAge(p.date_of_birth)}`;
       document.getElementById('d-sex').textContent = p.sex || '—';
@@ -1250,17 +1576,30 @@
       document.getElementById('d-email').textContent = p.email || '—';
       document.getElementById('d-address').textContent = `${p.address_line_1 || ''}${p.address_line_2 ? ', ' + p.address_line_2 : ''}, ${p.city}, ${p.state} ${p.zip_code}`;
       document.getElementById('d-lang').textContent = p.preferred_language || 'English';
-      document.getElementById('d-insurance').textContent = p.insurance_provider || 'None / Self-pay';
+      document.getElementById('d-insurance').textContent = p.insurance_provider || 'Self-pay';
       document.getElementById('d-member-id').textContent = p.insurance_member_id || '—';
       document.getElementById('d-emergency').textContent = p.emergency_contact_name || '—';
-      document.getElementById('d-emergency-phone').textContent = fmtPhone(p.emergency_contact_phone) || '—';
 
-      const transcriptContainer = document.getElementById('transcript-container');
+      // Populate Edit Form
+      document.getElementById('e-first-name').value = p.first_name || '';
+      document.getElementById('e-last-name').value = p.last_name || '';
+      document.getElementById('e-phone').value = p.phone_number || '';
+      document.getElementById('e-email').value = p.email || '';
+      document.getElementById('e-address').value = p.address_line_1 || '';
+      document.getElementById('e-city').value = p.city || '';
+      document.getElementById('e-state').value = p.state || '';
+      document.getElementById('e-zip').value = p.zip_code || '';
+      document.getElementById('e-insurance').value = p.insurance_provider || '';
+      document.getElementById('e-member-id').value = p.insurance_member_id || '';
+
+      // Format Transcript Bubbles
+      const transcriptSection = document.getElementById('transcript-container');
+      const streamEl = document.getElementById('transcript-stream');
       if (p.call_transcript) {
-        document.getElementById('d-transcript').textContent = p.call_transcript;
-        transcriptContainer.style.display = 'block';
+        streamEl.innerHTML = formatTranscriptDialogue(p.call_transcript);
+        transcriptSection.style.display = 'block';
       } else {
-        transcriptContainer.style.display = 'none';
+        transcriptSection.style.display = 'none';
       }
 
       document.getElementById('patient-dialog').showModal();
@@ -1269,15 +1608,78 @@
     }
   }
 
+  function formatTranscriptDialogue(raw) {
+    const lines = raw.split('\n').filter(l => l.trim().length > 0);
+    return lines.map(line => {
+      const isRiley = line.toLowerCase().startsWith('riley:') || line.toLowerCase().startsWith('assistant:');
+      const text = line.replace(/^(riley|assistant|caller|user):\s*/i, '');
+      const role = isRiley ? 'Riley (AI)' : 'Patient';
+      const cls = isRiley ? 'riley' : 'caller';
+
+      return `
+        <div class="chat-msg ${cls}">
+          <div class="msg-role">${role}</div>
+          <div>${esc(text)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggleEditMode(enable) {
+    isEditing = enable;
+    document.getElementById('view-mode-body').style.display = enable ? 'none' : 'block';
+    document.getElementById('view-mode-footer').style.display = enable ? 'none' : 'flex';
+    document.getElementById('edit-patient-form').style.display = enable ? 'block' : 'none';
+    document.getElementById('btn-toggle-edit').textContent = enable ? 'Cancel Edit' : 'Edit Chart';
+  }
+
+  document.getElementById('btn-toggle-edit').onclick = () => {
+    toggleEditMode(!isEditing);
+  };
+
+  async function handleEditSubmit(e) {
+    e.preventDefault();
+    if (!currentViewingId) return;
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+    payload.phone_number = payload.phone_number.replace(/\D/g, '');
+    payload.state = payload.state.toUpperCase().trim();
+
+    const saveBtn = document.getElementById('btn-save-edit');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch(`/patients/${currentViewingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error?.message || 'Update failed');
+      toast('Patient chart updated successfully');
+      viewPatient(currentViewingId);
+      fetchPatients(true);
+    } catch (err) {
+      toast('Update error: ' + err.message, 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    }
+  }
+
   function closePatientDialog() {
     document.getElementById('patient-dialog').close();
     currentViewingId = null;
+    toggleEditMode(false);
   }
 
   // Delete Patient
   document.getElementById('btn-delete-patient').onclick = async () => {
     if (!currentViewingId) return;
-    if (!confirm('Are you sure you want to remove this patient from the active registry?')) return;
+    if (!confirm('Are you sure you want to archive this patient from the active registry?')) return;
 
     try {
       const res = await fetch(`/patients/${currentViewingId}`, { method: 'DELETE' });
@@ -1285,16 +1687,14 @@
       if (!res.ok || json.error) throw new Error(json.error?.message || 'Delete failed');
       toast('Patient record archived');
       closePatientDialog();
-      fetchPatients();
+      fetchPatients(true);
     } catch (err) {
       toast('Failed to delete: ' + err.message, 'error');
     }
   };
 
   // ── Manual Intake Modal ───────────────────────────────────
-  function openManualIntake() {
-    document.getElementById('manual-dialog').showModal();
-  }
+  function openManualIntake() { document.getElementById('manual-dialog').showModal(); }
   function closeManualIntake() {
     document.getElementById('manual-dialog').close();
     document.getElementById('manual-intake-form').reset();
@@ -1306,8 +1706,6 @@
     const form = e.target;
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
-    
-    // Clean phone number
     payload.phone_number = payload.phone_number.replace(/\D/g, '');
     payload.state = payload.state.toUpperCase().trim();
 
@@ -1325,19 +1723,86 @@
       if (!res.ok || json.error) throw new Error(json.error?.message || 'Registration failed');
       toast(`Patient ${json.data.first_name} ${json.data.last_name} registered!`);
       closeManualIntake();
-      fetchPatients();
+      fetchPatients(true);
     } catch (err) {
       toast(err.message, 'error');
     } finally {
       saveBtn.disabled = false;
-      saveBtn.textContent = 'Save Patient';
+      saveBtn.textContent = 'Submit Intake';
     }
   }
+
+  // ── Quick Demo Intake Simulator ───────────────────────────
+  async function generateDemoPatient() {
+    const samples = [
+      { first_name: "James", last_name: "Wilson", dob: "1982-08-14", sex: "Male", phone: "555" + Math.floor(1000000 + Math.random() * 9000000), city: "Denver", state: "CO", zip: "80202", ins: "UnitedHealthcare", member: "UHC-77491" },
+      { first_name: "Elena", last_name: "Reyes", dob: "1991-03-29", sex: "Female", phone: "555" + Math.floor(1000000 + Math.random() * 9000000), city: "Seattle", state: "WA", zip: "98101", ins: "Aetna", member: "AET-33921" },
+      { first_name: "Marcus", last_name: "Sterling", dob: "1974-11-05", sex: "Male", phone: "555" + Math.floor(1000000 + Math.random() * 9000000), city: "Austin", state: "TX", zip: "78701", ins: "Cigna", member: "CG-88124" }
+    ];
+    const s = samples[Math.floor(Math.random() * samples.length)];
+
+    const payload = {
+      first_name: s.first_name,
+      last_name: s.last_name,
+      date_of_birth: s.dob,
+      sex: s.sex,
+      phone_number: s.phone,
+      email: `${s.first_name.toLowerCase()}.${s.last_name.toLowerCase()}@example.com`,
+      address_line_1: "742 Evergreen Terrace",
+      city: s.city,
+      state: s.state,
+      zip_code: s.zip,
+      insurance_provider: s.ins,
+      insurance_member_id: s.member,
+      preferred_language: "English"
+    };
+
+    try {
+      const res = await fetch('/patients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error?.message || 'Demo failed');
+
+      // Attach simulated transcript
+      const sampleTranscript = `Riley: Thanks for calling CareCloud Family Health, this is Riley. Are you calling to register as a new patient?
+Caller: Yes, I am.
+Riley: Great! What's your first name?
+Caller: ${s.first_name}.
+Riley: And your last name?
+Caller: ${s.last_name}.
+Riley: What's your date of birth?
+Caller: ${s.dob}.
+Riley: For our medical records, how would you like your sex listed?
+Caller: ${s.sex}.
+Riley: What city and state do you live in?
+Caller: ${s.city}, ${s.state}.
+Riley: Does everything sound correct?
+Caller: Yes, everything looks great.
+Riley: Wonderful! I have you all registered. Thank you for choosing CareCloud!`;
+
+      // Simulating attached transcript
+      await fetch(`/patients/${json.data.patient_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ call_transcript: sampleTranscript })
+      });
+
+      toast(`⚡ Demo patient ${s.first_name} ${s.last_name} created with AI transcript!`);
+      fetchPatients(true);
+    } catch (err) {
+      toast('Demo generation failed: ' + err.message, 'error');
+    }
+  }
+
+  document.getElementById('btn-demo-intake').onclick = generateDemoPatient;
 
   // ── Export CSV ────────────────────────────────────────────
   document.getElementById('btn-export').onclick = () => {
     if (!patientsData.length) {
-      toast('No patient records to export', 'error');
+      toast('No records to export', 'error');
       return;
     }
     const headers = ["First Name", "Last Name", "DOB", "Sex", "Phone", "Email", "Address", "City", "State", "ZIP", "Insurance", "Member ID", "Registered At"];
@@ -1348,31 +1813,65 @@
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `carecloud_patients_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `carecloud_registry_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();
-    toast('Exported patient registry CSV');
+    toast('Exported registry CSV');
   };
 
-  // ── Search & Filter Listeners ─────────────────────────────
-  document.getElementById('q-search').addEventListener('input', renderTable);
-  document.getElementById('filter-sex').addEventListener('change', renderTable);
-  document.getElementById('btn-refresh').addEventListener('click', () => {
-    const btn = document.getElementById('btn-refresh');
-    btn.style.transform = 'rotate(360deg)';
-    btn.style.transition = 'transform 0.5s ease';
-    fetchPatients();
-    setTimeout(() => { btn.style.transform = 'none'; btn.style.transition = 'none'; }, 500);
+  // ── Filter Chips Listener ─────────────────────────────────
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilterChip = chip.dataset.filter;
+      renderTable();
+    });
   });
 
-  // Initial Load
+  // ── Keyboard Shortcuts ────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    // If typing in an input or textarea, don't trigger shortcuts
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+      if (e.key === 'Escape') document.activeElement.blur();
+      return;
+    }
+
+    if (e.key === '/') {
+      e.preventDefault();
+      document.getElementById('q-search').focus();
+    } else if (e.key.toLowerCase() === 'n') {
+      e.preventDefault();
+      openManualIntake();
+    } else if (e.key.toLowerCase() === 'r') {
+      e.preventDefault();
+      fetchPatients(true);
+      toast('Registry refreshed');
+    } else if (e.key === 'Escape') {
+      closePatientDialog();
+      closeManualIntake();
+    }
+  });
+
+  document.getElementById('q-search').addEventListener('input', () => renderTable());
+  document.getElementById('btn-refresh').addEventListener('click', () => {
+    fetchPatients();
+    toast('Registry refreshed');
+  });
+
+  // Initial Boot
+  initTheme();
   checkHealth();
   fetchPatients();
-  setInterval(checkHealth, 30000);
+
+  // Background Live Sync (Every 6 seconds)
+  setInterval(() => {
+    fetchPatients(true);
+    checkHealth();
+  }, 6000);
 </script>
 
 <!-- ─── Vapi Web SDK Voice Integration ────────────────────── -->
@@ -1382,11 +1881,11 @@
   const vapi = new Vapi("3205a16f-26e2-4729-9dec-6c86f6fe1c1e");
   const callBtn = document.getElementById("call-btn");
   const callBtnText = document.getElementById("call-btn-text");
-  const bannerEndBtn = document.getElementById("banner-end-call-btn");
-  const banner = document.getElementById("call-banner");
+  const stageEndBtn = document.getElementById("stage-end-call-btn");
+  const stage = document.getElementById("voice-stage");
   const statusBadge = document.getElementById("call-status");
   const durationEl = document.getElementById("call-duration");
-  const liveTranscript = document.getElementById("live-transcript");
+  const liveCaption = document.getElementById("live-caption");
 
   let active = false;
   let timerInterval = null;
@@ -1400,10 +1899,10 @@
 
   function startCallTimer() {
     seconds = 0;
-    durationEl.textContent = `Call duration: 00:00`;
+    durationEl.textContent = `Call Duration: 00:00`;
     timerInterval = setInterval(() => {
       seconds++;
-      durationEl.textContent = `Call duration: ${formatTime(seconds)}`;
+      durationEl.textContent = `Call Duration: ${formatTime(seconds)}`;
     }, 1000);
   }
 
@@ -1426,35 +1925,37 @@
     else startCall();
   };
 
-  bannerEndBtn.onclick = stopCall;
+  stageEndBtn.onclick = stopCall;
 
   vapi.on("call-start", () => {
     active = true;
     callBtnText.textContent = "End Call";
     callBtn.classList.add("in-call");
-    banner.classList.add("active");
+    stage.classList.add("active");
+    stage.classList.add("listening");
     statusBadge.textContent = "Riley is Listening";
-    statusBadge.style.background = "rgba(16, 185, 129, 0.2)";
     startCallTimer();
     toast("Voice call with Riley connected!");
   });
 
   vapi.on("speech-start", () => {
+    stage.classList.remove("listening");
+    stage.classList.add("speaking");
     statusBadge.textContent = "Riley Speaking…";
-    statusBadge.style.background = "rgba(56, 189, 248, 0.25)";
     statusBadge.style.color = "#38bdf8";
   });
 
   vapi.on("speech-end", () => {
+    stage.classList.remove("speaking");
+    stage.classList.add("listening");
     statusBadge.textContent = "Riley Listening…";
-    statusBadge.style.background = "rgba(16, 185, 129, 0.2)";
     statusBadge.style.color = "#34d399";
   });
 
   vapi.on("message", (msg) => {
     if (msg.type === "transcript" && msg.transcript) {
-      liveTranscript.style.display = "block";
-      liveTranscript.textContent = `"${msg.transcript}"`;
+      liveCaption.style.display = "block";
+      liveCaption.textContent = `"${msg.transcript}"`;
     }
   });
 
@@ -1462,19 +1963,19 @@
     active = false;
     callBtnText.textContent = "Talk to Riley";
     callBtn.classList.remove("in-call");
-    banner.classList.remove("active");
-    liveTranscript.style.display = "none";
+    stage.classList.remove("active", "speaking", "listening");
+    liveCaption.style.display = "none";
     stopCallTimer();
-    toast("Intake call ended. Updating registry…");
-    fetchPatients();
+    toast("Intake call ended. Syncing registry…");
+    fetchPatients(true);
   });
 
   vapi.on("error", (e) => {
     console.error("Vapi Error:", e);
-    toast("Call error: " + (e?.message || "connection error"), "error");
+    toast("Voice error: " + (e?.message || "connection error"), "error");
     callBtnText.textContent = "Talk to Riley";
     callBtn.classList.remove("in-call");
-    banner.classList.remove("active");
+    stage.classList.remove("active", "speaking", "listening");
     stopCallTimer();
   });
 </script>
